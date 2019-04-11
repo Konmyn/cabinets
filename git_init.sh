@@ -1,6 +1,8 @@
 #! /bin/bash
 # my specific git settings
 
+git config --global --list
+
 git config --global user.name 'ethan'
 git config --global user.email 'konmyn@gmail.com'
 git config --global push.default simple
