@@ -19,7 +19,7 @@ git config --global alias.st status
 
 # 解决中文文件显示问题
 git config --global core.quotepath false
-git config core.editor vim
+git config --global core.editor vim
 
 git config --global --list
 
