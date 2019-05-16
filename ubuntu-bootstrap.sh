@@ -10,14 +10,16 @@ id
 echo $EUID
 echo "home:" $HOME
 
-ls /etc/apt/sources.list.backup &> /dev/null || ( echo "backup apt sources" && cp /etc/apt/sources.list /etc/apt/sources.list.backup )
-grep -E "security.ubuntu.com|cn.archive.ubuntu.com" /etc/apt/sources.list && ( sed -i 's/cn.archive.ubuntu.com/mirrors.cn99.com/g' /etc/apt/sources.list && sed -i 's/security.ubuntu.com/mirrors.cn99.com/g' /etc/apt/sources.list )
+# change apt source manually
+# apt update && apt install git -y
+#ls /etc/apt/sources.list.backup &> /dev/null || ( echo "backup apt sources" && cp /etc/apt/sources.list /etc/apt/sources.list.backup )
+#grep -E "security.ubuntu.com|cn.archive.ubuntu.com" /etc/apt/sources.list && ( sed -i 's/cn.archive.ubuntu.com/mirrors.cn99.com/g' /etc/apt/sources.list && sed -i 's/security.ubuntu.com/mirrors.cn99.com/g' /etc/apt/sources.list )
 
 apt update && apt upgrade -y
 apt autoclean
 apt clean
 apt autoremove
-apt install open-vm-tools-desktop vim git openssh-server curl zsh python3-pip tree htop glances -y
+apt install open-vm-tools-desktop vim openssh-server curl zsh python3-pip tree htop glances -y
 
 # https://linuxconfig.org/how-to-change-welcome-message-motd-on-ubuntu-18-04-server
 # disable login message for user
