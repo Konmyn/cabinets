@@ -1,17 +1,21 @@
 #!/bin/bash
 
+echo "user:" $(id)
 echo "home:" $HOME
 
 # https://linuxconfig.org/how-to-change-welcome-message-motd-on-ubuntu-18-04-server
 # disable login message for user
 touch $HOME/.hushlogin
 
-sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)" exit
+sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 
 # https://github.com/wting/autojump
+mkdir -p workspace/github
+cd workspace/github
 git clone git://github.com/wting/autojump.git
 cd autojump
 ./install.py
+cd ~
 echo '[[ -s /home/matrix/.autojump/etc/profile.d/autojump.sh ]] && source /home/matrix/.autojump/etc/profile.d/autojump.sh' >> ~/.zshrc
 echo 'autoload -U compinit && compinit -u' >> ~/.zshrc
 

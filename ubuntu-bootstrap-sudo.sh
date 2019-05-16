@@ -5,6 +5,7 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 
+echo "user:" $(id)
 echo "home:" $HOME
 
 # change apt source manually
