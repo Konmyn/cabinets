@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run use sudo "
-  exit
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run use sudo "
+    exit
 fi
 
 echo "user:" $(id)
@@ -19,7 +19,7 @@ apt clean
 apt autoremove
 apt install open-vm-tools-desktop vim openssh-server curl zsh python3-pip tree htop glances -y
 
-cat > /etc/pip.conf << EOF
+cat >/etc/pip.conf <<EOF
 [global]
 index-url = https://mirrors.aliyun.com/pypi/simple/
 EOF

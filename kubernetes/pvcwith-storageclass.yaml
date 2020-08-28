@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: graylog-journal
+  namespace: logging
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 120Gi
+  storageClassName: csi-rbd
+status:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: 120Gi
+    

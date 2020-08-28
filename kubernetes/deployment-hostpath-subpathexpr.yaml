@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: subpathexpr-deploy
+  labels:
+    app: subpathexpr
+spec:
+  selector:
+    matchLabels:
+      app: subpathexpr
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: subpathexpr
+    spec:
+      nodeName: k8s01
+      containers:
+      - name: busybox
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        image: docker.io/busybox:1.28.4
+        command:
+        - /bin/sh
+        - -c
+        - 'sleep 99999'
+        volumeMounts:
+        - name: logdir
+          mountPath: /app/logs
+          subPathExpr: $(NAMESPACE)/$(POD_NAME)
+      volumes:
+      - name: logdir
+        hostPath:
+          path: /logs/subpathexpr-test
+          type: DirectoryOrCreate

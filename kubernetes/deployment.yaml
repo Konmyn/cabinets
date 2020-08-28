@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-deploy
+  labels:
+    app: busybox
+spec:
+  selector:
+    matchLabels:
+      app: busybox
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: busybox
+        image: docker.io/busybox:1.28.4
+        command:
+        - /bin/sh
+        - -c
+        - 'sleep 99999'
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        volumeMounts:
+        - name: game-config
+          mountPath: /app/
+          subPath: readme
+      volumes:
+      - name: game-config
+        configMap:
+          defaultMode: 0600
+          name: game-config
+          items:
+          - key: ui.properties
+            path: readme/ui.conf
+          - key: game.properties
+            path: readme/game.conf
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: game-config
+  labels:
+    app: busybox
+data:
+  game.properties: |
+    enemies=aliens
+    lives=3
+    enemies.cheat=true
+    enemies.cheat.level=noGoodRotten
+    secret.code.passphrase=UUDDLRLRBABAS
+    secret.code.allowed=true
+    secret.code.lives=30
+  ui.properties: |
+    color.good=purple
+    color.bad=yellow
+    allow.textmode=true
+    how.nice.to.look=fairlyNice
+  color: purple
+  how: fairlyNice
+  textmode: "true"
+

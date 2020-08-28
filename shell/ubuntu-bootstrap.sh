@@ -16,8 +16,8 @@ git clone git://github.com/wting/autojump.git
 cd autojump
 ./install.py
 cd ~
-echo '[[ -s /home/matrix/.autojump/etc/profile.d/autojump.sh ]] && source /home/matrix/.autojump/etc/profile.d/autojump.sh' >> ~/.zshrc
-echo 'autoload -U compinit && compinit -u' >> ~/.zshrc
+echo '[[ -s /home/matrix/.autojump/etc/profile.d/autojump.sh ]] && source /home/matrix/.autojump/etc/profile.d/autojump.sh' >>~/.zshrc
+echo 'autoload -U compinit && compinit -u' >>~/.zshrc
 
 sed -i 's/#force_color_prompt/force_color_prompt/g' ~/.bashrc && sed -i 's/alF/lh/g' ~/.bashrc
 

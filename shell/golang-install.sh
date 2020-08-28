@@ -8,7 +8,7 @@ else
 fi
 
 sudo tar -C /usr/local -xzf $file
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+echo 'export PATH=$PATH:/usr/local/go/bin' >>~/.bashrc
 
 mkdir $HOME/go
 
