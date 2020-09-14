@@ -1,0 +1,17 @@
+# https://gist.github.com/mosquito/b23e1c1e5723a7fd9e6568e5cf91180f
+# cp harbor-docker.service /etc/systemd/system
+# 记得确认 harbor 路径是否正确
+[Unit]
+Description="Harbor (container registry) service by docker-compose"
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=true
+WorkingDirectory=/app/harbor
+ExecStart=/usr/local/bin/docker-compose up -d --remove-orphans
+ExecStop=/usr/local/bin/docker-compose down
+
+[Install]
+WantedBy=multi-user.target
