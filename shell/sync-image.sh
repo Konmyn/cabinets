@@ -9,8 +9,10 @@ if [[ "$1" == "" ]]; then
     exit 1
 fi
 origin_image=$1
+
 if [[ $origin_image == *"/"* ]]; then
-    target_image=${2-"harbor.beautytiger.com/${origin_image}"}
+    # 删除私有registry前缀，添加自定义registry前缀
+    target_image=${2-"harbor.beautytiger.com/${origin_image#harbor.beautytiger.com/}"}
 else
     target_image=${2-"harbor.beautytiger.com/docker.io/${origin_image}"}
 fi

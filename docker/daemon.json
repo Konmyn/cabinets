@@ -1,0 +1,17 @@
+{
+    "insecure-registries": [
+        "0.0.0.0/0"
+    ],
+    "registry-mirrors": [
+        "http://ovfftd6p.mirror.aliyuncs.com",
+        "http://registry.docker-cn.com",
+        "http://docker.mirrors.ustc.edu.cn",
+        "http://hub-mirror.c.163.com"
+    ],
+    "live-restore": true,
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "100m",
+        "max-file": "3"
+    }
+}

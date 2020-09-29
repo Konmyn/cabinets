@@ -21,6 +21,9 @@ spec:
         - /bin/sh
         - -c
         - 'sleep 99999'
+        ports:
+        - containerPort: 8000
+          name: http
         resources:
           limits:
             cpu: "1"
@@ -55,7 +58,6 @@ data:
     lives=3
     enemies.cheat=true
     enemies.cheat.level=noGoodRotten
-    secret.code.passphrase=UUDDLRLRBABAS
     secret.code.allowed=true
     secret.code.lives=30
   ui.properties: |
@@ -66,4 +68,3 @@ data:
   color: purple
   how: fairlyNice
   textmode: "true"
-
