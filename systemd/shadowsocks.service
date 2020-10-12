@@ -1,0 +1,15 @@
+# 需要先安装shadowsocks服务
+# cat /etc/systemd/system/shadowsocks.service
+# 安装
+# cp shadowsocks.service /etc/systemd/system
+[Unit]
+Description=Shadowsocks Client Service
+After=network.target
+
+[Service]
+Type=simple
+User=nobody
+ExecStart=/usr/local/bin/sslocal -c /app/proxyconf/working.json
+
+[Install]
+WantedBy=multi-user.target

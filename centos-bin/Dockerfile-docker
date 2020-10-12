@@ -1,0 +1,18 @@
+FROM harbor.beautytiger.com/docker.io/centos:7.6.1810
+
+# 禁用yum的repo查找功能
+RUN sed -i 's/enabled=1/enabled=0/g' /etc/yum/pluginconf.d/fastestmirror.conf && \
+    # 删除默认repo，使用国内的repo源
+    # https://developer.aliyun.com/mirror/centos
+    rm /etc/yum.repos.d/CentOS-Base.repo && \
+    curl -o /etc/yum.repos.d/CentOS-Base.repo https://mirrors.aliyun.com/repo/Centos-7.repo && \
+    sed -i -e '/mirrors.cloud.aliyuncs.com/d' -e '/mirrors.aliyuncs.com/d' /etc/yum.repos.d/CentOS-Base.repo && \
+    # 安装docker的repo源，直接使用国内的源
+    yum install -y yum-utils --nogpgcheck && \
+    yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo && \
+    # 安装docker
+    yum install -y containerd.io-1.2.13 docker-ce-19.03.11 docker-ce-cli-19.03.11 --downloadonly --downloaddir=/data/docker --nogpgcheck && \
+    # 安装其他所需的包
+    yum install --skip-broken nfs-utils lvm2 systemd-units xfsprogs device-mapper-persistent-data --nogpgcheck --downloadonly --downloaddir=/data/docker && \
+    # 清除yum缓存
+    yum clean all

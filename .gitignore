@@ -1,2 +1,5 @@
 *.gz
+*.rpm
 kubernetes-bin/
+centos-bin/docker
+centos-bin/system-rpm

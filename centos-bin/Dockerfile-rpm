@@ -1,0 +1,4 @@
+FROM harbor.beautytiger.com/docker.io/centos:7.6.1810
+
+RUN yum install htop ca-certificates socat telnet tree conntrack --downloadonly --downloaddir=/data/bin --skip-broken --nogpgcheck -y && \
+    yum clean all
