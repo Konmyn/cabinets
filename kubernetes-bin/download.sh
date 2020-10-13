@@ -32,8 +32,6 @@ fi
 pushd "${RELEASE}"
 if [[ -f ${info_file} ]]; then
     echo "file already downloaded"
-    download_image
-
 else
     echo "start download file"
     curl -L --remote-name-all ${proxy} https://storage.googleapis.com/kubernetes-release/release/${RELEASE}/bin/linux/amd64/{kubeadm,kubelet,kubectl}
