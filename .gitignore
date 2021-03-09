@@ -1,5 +1,7 @@
 *.gz
 *.rpm
+*.tgz
+docker-compose
 
 kubernetes-bin/v1.*
 operator/v*

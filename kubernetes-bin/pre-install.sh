@@ -33,19 +33,32 @@ setenforce 0 && sed -i '/^SELINUX=/c\SELINUX=disabled' /etc/selinux/config
 
 # 关闭swap内存
 swapoff -a
-sed -i '/ swap / s/^#*/#/' /etc/fstab
+sed -i '/swap / s/^#*/#/' /etc/fstab
 
 # 设置 sysctl 参数
 echo "modify sysctl options"
 cat >/etc/sysctl.d/k8s.conf <<-EOF
-vm.swappiness = 0
+vm.swappiness=0
 fs.inotify.max_user_watches=524288
-vm.max_map_count=1000000
-net.bridge.bridge-nf-call-ip6tables = 1
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward=1
+fs.inotify.max_user_instances=8192
 net.netfilter.nf_conntrack_max=1000000
+vm.max_map_count=1000000
+net.bridge.bridge-nf-call-ip6tables=1
+net.bridge.bridge-nf-call-iptables=1
+net.ipv4.ip_forward=1
+net.ipv6.conf.all.disable_ipv6=1
 EOF
+
+# 其他可能需要调节的参数：
+# vm.overcommit_memory=1
+# net.ipv4.tcp_tw_recycle=0
+# vm.panic_on_oom=0
+# fs.file-max=52706963
+# fs.nr_open=52706963
+# 以上的值默认就是或者设置的已经比较大了
+# net.ipv4.neigh.default.gc_thresh1=1024
+# net.ipv4.neigh.default.gc_thresh2=2048
+# net.ipv4.neigh.default.gc_thresh3=4096
 
 lsmod | grep conntrack || modprobe ip_conntrack
 

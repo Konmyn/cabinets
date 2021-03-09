@@ -10,6 +10,7 @@ apiVersion: v1
 data:
   worker-shutdown-timeout: "300"
   server-tokens: "false"
+  use-forwarded-headers: "true"
 kind: ConfigMap
 metadata:
   name: nginx-configuration

@@ -1,0 +1,18 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-stress
+  namespace: internal-debug
+  labels:
+    app: kafka-stress
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: kafka-stress
+        image: docker.io/kafka:2.12-2.5.0
+        command:
+        - /bin/bash
+        - -c 
+        - "/opt/kafka/bin/kafka-producer-perf-test.sh --topic kafka-test --num-records 10000000 --record-size 2048 --throughput -1 --producer-props bootstrap.servers=10.20.110.201:9092,10.20.110.202:9092,10.20.110.203:9092"

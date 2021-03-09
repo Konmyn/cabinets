@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: centos
+  labels:
+    app: centos
+spec:
+  selector:
+    matchLabels:
+      app: centos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: centos
+    spec:
+      containers:
+      - name: centos
+        image: harbor.beautytiger.com/docker.io/centos:rich
+        command:
+        - /bin/bash
+        - -c
+        - 'sleep 999999'

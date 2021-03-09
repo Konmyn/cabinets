@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mycli
+    deploy-by: wang.guangming
+  name: mycli
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mycli
+  template:
+    metadata:
+      labels:
+        app: mycli
+    spec:
+      containers:
+      - command:
+        - /bin/bash
+        - -c
+        - sleep 99999999
+        image: harbor.beautytiger.com/docker.io/mycli:1.22.2
+        imagePullPolicy: Always
+        name: mycli
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 100Mi
