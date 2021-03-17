@@ -40,6 +40,7 @@ metadata:
     app: nginx
   name: nginx
 spec:
+  # 域名需按实际修改
   host: nginx-test.apps.develop.beautytiger.com
   port:
     targetPort: 8080
@@ -47,3 +48,5 @@ spec:
     kind: Service
     name: nginx
     weight: 100
+  tls:
+    termination: edge

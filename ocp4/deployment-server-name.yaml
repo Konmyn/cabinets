@@ -43,6 +43,7 @@ metadata:
     haproxy.router.openshift.io/balance: roundrobin
     haproxy.router.openshift.io/disable_cookies: "true"
 spec:
+  # 域名需修改
   host: server-name.apps.develop.beautytiger.com
   port:
     targetPort: 8080
@@ -50,3 +51,5 @@ spec:
     kind: Service
     name: server-name
     weight: 100
+  tls:
+    termination: edge

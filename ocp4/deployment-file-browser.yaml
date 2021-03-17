@@ -1,27 +1,42 @@
+kind: ConfigMap
+metadata:
+  name: filebrowser-config
+apiVersion: v1
+data:
+  .filebrowser.json: |
+    {
+      "port": 8080,
+      "baseURL": "",
+      "address": "",
+      "log": "stdout",
+      "database": "/database.db",
+      "root": "/srv"
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nfsmount
+  name: filebrowser
   labels:
-    app: nfsmount
+    app: filebrowser
 spec:
   selector:
     matchLabels:
-      app: nfsmount
-  replicas: 3
+      app: filebrowser
+  replicas: 1
   template:
     metadata:
       labels:
-        app: nfsmount
+        app: filebrowser
     spec:
       # 需提前创建 cluster-role-mount-anyuid.yaml
       # sa需要提前创建，并且赋予相应的权限
-      # oc -n <namespace> create sa nfsmount
-      # oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z nfsmount
-      serviceAccountName: nfsmount
+      # oc -n <namespace> create sa filebrowser
+      # oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z filebrowser
+      serviceAccountName: filebrowser
       containers:
-      - name: nginx
-        image: quay.io/bitnami/nginx:1.19.7
+      - name: filebrowser
+        image: docker.io/filebrowser/filebrowser
         ports:
         - containerPort: 8080
         env:
@@ -37,26 +52,29 @@ spec:
               fieldPath: metadata.namespace
         volumeMounts:
         - name: nfs-volume
-          mountPath: /logs
-          # 如果是pod间共享，则不需要 subPathExpr
-          subPathExpr: $(NAMESPACE)/$(POD_NAME)
+          mountPath: /srv
+        - name: config-volume
+          mountPath: /
       volumes:
       - name: nfs-volume
         nfs:
           # nfs地址和挂载路径需要更改
           server: 10.72.93.235
           path: /data/nfs
+      - name: config-volume
+        configMap:
+          name: filebrowser-config
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nfsmount
+  name: filebrowser
   labels:
-    app: nfsmount
+    app: filebrowser
 spec:
   type: ClusterIP
   selector:
-    app: nfsmount
+    app: filebrowser
   ports:
   - protocol: TCP
     port: 80
@@ -66,16 +84,19 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   labels:
-    app: nfsmount
-  name: nfsmount
+    app: filebrowser
+  name: filebrowser
+  annotations:
+    haproxy.router.openshift.io/balance: roundrobin
+    haproxy.router.openshift.io/disable_cookies: "true"
 spec:
   # 域名需要修改
-  host: nfsmount-test.apps.develop.beautytiger.com
+  host: filebrowser.apps.develop.beautytiger.com
   port:
     targetPort: 8080
   to:
     kind: Service
-    name: nfsmount
+    name: filebrowser
     weight: 100
   tls:
     termination: edge
