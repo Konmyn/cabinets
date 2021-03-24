@@ -1,15 +1,15 @@
-# oc -n <namespace> create sa nfsmount
+# oc -n <namespace> create sa stsnfsmount
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: nfsmount
+  name: stsnfsmount
 ---
 # 需提前创建 cluster-role-mount-anyuid.yaml
-# oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z nfsmount
+# oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z stsnfsmount
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: nfsmount
+  name: stsnfsmount
   # namespace需要修改
   namespace: test
 roleRef:
@@ -18,28 +18,29 @@ roleRef:
   name: system:openshift:scc:hostmount-anyuid
 subjects:
 - kind: ServiceAccount
-  name: nfsmount
+  name: stsnfsmount
   # namespace需要修改
   namespace: test
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
-  name: nfsmount
+  name: stsnfsmount
   labels:
-    app: nfsmount
+    app: stsnfsmount
 spec:
   selector:
     matchLabels:
-      app: nfsmount
+      app: stsnfsmount
   replicas: 3
   template:
     metadata:
       labels:
-        app: nfsmount
+        app: stsnfsmount
     spec:
       # 对应的sa
-      serviceAccountName: nfsmount
+      serviceName: "nginx-headless"
+      serviceAccountName: stsnfsmount
       containers:
       - name: nginx
         image: quay.io/bitnami/nginx:1.19.7
@@ -60,7 +61,7 @@ spec:
         - name: nfs-volume
           mountPath: /logs
           # 如果是pod间共享，则不需要 subPathExpr
-          # subPathExpr: $(NAMESPACE)/$(POD_NAME)
+          subPathExpr: $(NAMESPACE)/$(POD_NAME)
       volumes:
       - name: nfs-volume
         nfs:
@@ -71,13 +72,27 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: nfsmount
+  name: nginx-headless
   labels:
-    app: nfsmount
+    app: stsnfsmount
+spec:
+  ports:
+  - port: 8080
+    name: web
+  clusterIP: None
+  selector:
+    app: stsnfsmount
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stsnfsmount
+  labels:
+    app: stsnfsmount
 spec:
   type: ClusterIP
   selector:
-    app: nfsmount
+    app: stsnfsmount
   ports:
   - protocol: TCP
     port: 80
@@ -87,19 +102,19 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   labels:
-    app: nfsmount
-  name: nfsmount
+    app: stsnfsmount
+  name: stsnfsmount
   annotations:
     haproxy.router.openshift.io/balance: roundrobin
     haproxy.router.openshift.io/disable_cookies: "true"
 spec:
   # 域名需要修改
-  host: nfsmount-test.apps.dev.beautytiger.com
+  host: stsnfsmount-test.apps.dev.beautytiger.com
   port:
     targetPort: 8080
   to:
     kind: Service
-    name: nfsmount
+    name: stsnfsmount
     weight: 100
   tls:
     termination: edge

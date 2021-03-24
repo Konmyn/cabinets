@@ -9,3 +9,4 @@
 - kubernetes-bin: k8s的运行程序和镜像下载脚本
 - shell: 常用脚本
 - systemd: 常用工具的systemd定义
+- ocp4: demo application in openshift 4.x

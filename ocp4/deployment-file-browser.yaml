@@ -1,3 +1,27 @@
+# oc -n <namespace> create sa filebrowser
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: filebrowser
+---
+# 需提前创建 cluster-role-mount-anyuid.yaml
+# oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z filebrowser
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: filebrowser
+  # namespace需要修改
+  namespace: test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:hostmount-anyuid
+subjects:
+- kind: ServiceAccount
+  name: filebrowser
+  # namespace需要修改
+  namespace: test
+---
 kind: ConfigMap
 metadata:
   name: filebrowser-config
@@ -23,20 +47,18 @@ spec:
   selector:
     matchLabels:
       app: filebrowser
-  replicas: 1
+  # filebrowser需要会话保持，否则不支持多副本
+  replicas: 3
   template:
     metadata:
       labels:
         app: filebrowser
     spec:
-      # 需提前创建 cluster-role-mount-anyuid.yaml
-      # sa需要提前创建，并且赋予相应的权限
-      # oc -n <namespace> create sa filebrowser
-      # oc -n <namespace> adm policy add-role-to-user system:openshift:scc:hostmount-anyuid -z filebrowser
+      # 对应的sa
       serviceAccountName: filebrowser
       containers:
       - name: filebrowser
-        image: docker.io/filebrowser/filebrowser
+        image: docker.io/filebrowser/filebrowser:v2.13.0
         ports:
         - containerPort: 8080
         env:
@@ -53,14 +75,17 @@ spec:
         volumeMounts:
         - name: nfs-volume
           mountPath: /srv
+          subPath: filebrowser
         - name: config-volume
-          mountPath: /
+          # https://github.com/kubernetes/kubernetes/issues/64825#issuecomment-395176395
+          mountPath: /.filebrowser.json
+          subPath: .filebrowser.json
       volumes:
       - name: nfs-volume
         nfs:
           # nfs地址和挂载路径需要更改
-          server: 10.72.93.235
-          path: /data/nfs
+          server: test-ocp-nfs.beautytiger.com
+          path: /nfs
       - name: config-volume
         configMap:
           name: filebrowser-config
@@ -86,12 +111,14 @@ metadata:
   labels:
     app: filebrowser
   name: filebrowser
-  annotations:
-    haproxy.router.openshift.io/balance: roundrobin
-    haproxy.router.openshift.io/disable_cookies: "true"
+  # filebrowser需要会话保持，否则不支持多副本，下面的annotation不能开启
+  # annotations:
+  #   haproxy.router.openshift.io/balance: roundrobin
+  #   haproxy.router.openshift.io/disable_cookies: "true"
 spec:
   # 域名需要修改
-  host: filebrowser.apps.develop.beautytiger.com
+  # 登录 admin/admin
+  host: filebrowser.apps.dev.beautytiger.com
   port:
     targetPort: 8080
   to:
@@ -100,3 +127,4 @@ spec:
     weight: 100
   tls:
     termination: edge
+    insecureEdgeTerminationPolicy: Redirect

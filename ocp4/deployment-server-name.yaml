@@ -42,14 +42,18 @@ metadata:
   annotations:
     haproxy.router.openshift.io/balance: roundrobin
     haproxy.router.openshift.io/disable_cookies: "true"
+    # 如果存在 x-forward-for，则再不添加 x-forward-for
+    haproxy.router.openshift.io/set-forwarded-headers: "if-none"
 spec:
   # 域名需修改
-  host: server-name.apps.develop.beautytiger.com
+  host: server-name.apps.dev.beautytiger.com
   port:
     targetPort: 8080
   to:
     kind: Service
     name: server-name
     weight: 100
-  tls:
-    termination: edge
+  # https 不支持直接获取客户端ip
+  # tls:
+  #   termination: edge
+  #   insecureEdgeTerminationPolicy: Redirect

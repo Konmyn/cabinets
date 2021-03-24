@@ -31,6 +31,7 @@ sed -i 's/reg.mydomain.com/harbor.centos79.beautytiger.com/g' harbor.yml
 
 ./install.sh
 
+cd 
 cat > harbor.service <<-EOF
 [Unit]
 Description="Harbor (container registry) service by docker-compose"

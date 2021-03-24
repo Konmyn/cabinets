@@ -1,0 +1,80 @@
+# 这个是 deployment-nginx-root-fail.yaml 的修复
+# oc -n <namespace> create sa runasany
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: runasany
+---
+# 需提前创建 cluster-role-mount-anyuid.yaml
+# oc -n <namespace> adm policy add-role-to-user system:openshift:scc:anyuid -z runasany
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: runasany
+  # namespace需要修改
+  namespace: test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+subjects:
+- kind: ServiceAccount
+  name: runasany
+  # namespace需要修改
+  namespace: test
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-root
+spec:
+  selector:
+    matchLabels:
+      app: nginx-root
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-root
+    spec:
+      # 增加sa，另其可以任意用户运行
+      serviceAccountName: runasany
+      containers:
+      - name: nginx-root
+        image: docker.io/nginx:1.19.8
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-root
+  labels:
+    app: nginx-root
+spec:
+  type: ClusterIP
+  selector:
+    app: nginx-root
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  labels:
+    app: nginx-root
+  name: nginx-root
+spec:
+  # 域名需按实际修改
+  host: nginx-root.apps.dev.beautytiger.com
+  port:
+    targetPort: 80
+  to:
+    kind: Service
+    name: nginx-root
+    weight: 100
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
