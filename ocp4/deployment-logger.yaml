@@ -15,14 +15,15 @@ spec:
     spec:
       containers:
       - name: logger
-        image: quay.io/guanwang/logger:v1.3
+        image: quay.io/guanwang/logger:v1.4
         env:
         # 总日志条数
         - name: LINE_TOTAL
-          value: '10000000'
+          value: '1000000'
         # 每秒日志条数，只支持1,10,100,1000
         - name: LINE_PER_SECOND
-          value: '1000'
+          value: '100'
         # 不限制每秒日志条数，当这个环境变量是true时，会忽略 LINE_PER_SECOND
-        - name: NO_SLEEP
+        # 慎用，这就像开车一直油门踩到底，一般人都不会这么做
+        - name: INSECURE_SELFTESTONLY_NO_SLEEP
           value: 'false'
