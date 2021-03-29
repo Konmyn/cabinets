@@ -34,6 +34,20 @@ data:
                 kubernetes.namespace: "logger"
       - drop_fields:
           fields: ["kubernetes.labels"]
+      # 源字段会保留
+      - dissect:
+          # 无法处理名字中有 - 的情况
+          # 因此此方案很不完善
+          tokenizer: '%{kubernetes.deployment.name}-%{kubernetes.replicaset.randomid}'
+          field: "kubernetes.replicaset.name"
+          target_prefix: ""
+          ignore_failure: true
+      - dissect:
+          tokenizer: '%{asctime},%{msecs} %{process} %{filename} %{lineno} %{name} %{levelname} %{message}'
+          field: "message"
+          # 以嵌套字段形式展示
+          target_prefix: "appinfo"
+          ignore_failure: true
 
     # output.elasticsearch:
     #   hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
@@ -123,7 +137,7 @@ spec:
       # data folder stores a registry of read status for all files, so we don't send everything again on a Filebeat pod restart
       # - name: data
       #   hostPath:
-      #     # When filebeat runs as non-root user, this directory needs to be writable by group (g+w).
+      #     # When filebeat runs as non-root user, this directory needs to be writable by group {g+w}.
       #     path: /var/lib/filebeat-data
       #     type: DirectoryOrCreate
 ---
